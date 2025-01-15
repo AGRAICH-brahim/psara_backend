@@ -24,7 +24,9 @@ import adoption.usermanagementservice.services.mappers.UserMapper;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -242,6 +244,79 @@ public class UserService {
             return response;
         }
     }
+
+
+
+    /* delete user */
+    public void deleteUser(Long id) {
+        // Vérifier si l'utilisateur existe
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // Supprimer l'utilisateur
+        userRepository.delete(user);
+    }
+
+    /* change user status */
+    public UserDto changeUserStatus(Long id) {
+        // Récupérer l'utilisateur par ID
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // Modifier le statut "estVerifie" de l'utilisateur
+        user.setEstVerifie(true);
+
+        // Sauvegarder les changements
+        userRepository.save(user);
+
+        // Retourner le DTO de type UserDto
+        return userMapper.toDto(user);
+    }
+
+
+
+    /* get all users */
+
+    public List<UserCreationDto> getAllUsers() {
+        // Récupérer tous les utilisateurs
+        List<User> users = userRepository.findAll();
+
+        // Transformer les entités en DTO
+        return users.stream().map(user -> {
+            UserCreationDto dto = new UserCreationDto();
+            dto.setId(user.getId());
+            dto.setEmail(user.getEmail());
+            dto.setPhone(user.getPhone());
+            dto.setRole(user.getRole());
+            dto.setEstVerifie(user.getEstVerifie());
+
+            // Ajouter des informations spécifiques selon le rôle
+            if ("ROLE_ASSOCIATION".equals(user.getRole())) {
+                Association association = associationRepository.findById(user.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Association not found"));
+                dto.setNomOrganisation(association.getNomOrganisation());
+                dto.setDescription(association.getDescription());
+                dto.setAdresse(association.getAdresse());
+                dto.setSiteWeb(association.getSiteWeb());
+                dto.setNr(association.getNr());
+                dto.setDocumentVerification(association.getDocumentVerification());
+            } else if (!"ROLE_ASSOCIATION".equals(user.getRole())) {
+                Utilisateur utilisateur = utilisateurRepository.findById(user.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Utilisateur not found"));
+                dto.setNom(utilisateur.getNom());
+                dto.setPrenom(utilisateur.getPrenom());
+                dto.setCin(utilisateur.getCin());
+            }
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+
+
+
+
+
+
 
 
     /*

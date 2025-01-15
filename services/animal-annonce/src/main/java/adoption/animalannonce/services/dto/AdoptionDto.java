@@ -14,4 +14,5 @@ public class AdoptionDto {
     private Long statusId; // Correspond à l'entité StatusEntity
     private StatusDto status;  // Ajouter un champ pour le StatusDto
     private Long animalAnnonceId; // Correspond à l'entité AnimalAnnonce
+    private AnimalAnnonceDto animalAnnonce; // DTO pour l'animal associé
 }

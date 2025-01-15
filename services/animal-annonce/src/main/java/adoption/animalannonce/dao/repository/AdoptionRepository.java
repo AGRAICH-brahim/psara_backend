@@ -14,4 +14,7 @@ public interface AdoptionRepository extends JpaRepository<Adoption, Long> {
     // Récupérer toutes les adoptions faites pour les annonces créées par un utilisateur
     @Query("SELECT a FROM Adoption a WHERE a.animalAnnonce.userCreation = :userId")
     List<Adoption> findAdoptionsByUserCreation(@Param("userId") Long userId);
+
+
+
 }

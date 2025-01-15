@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserManagementController {
@@ -31,6 +33,12 @@ public class UserManagementController {
         return userService.getUtilisateurById(id);
     }
 
+
+    @GetMapping("allusers")
+    public ResponseEntity<List<UserCreationDto>> getAllUsers() {
+        List<UserCreationDto> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
 
 
     @PostMapping("/create")
@@ -55,6 +63,32 @@ public class UserManagementController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Retourner 204 No Content en cas de succès
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
+    @PatchMapping("/changeStatus/{id}")
+    public ResponseEntity<UserDto> changeUserStatus(@PathVariable Long id) {
+        try {
+            UserDto updatedUser = userService.changeUserStatus(id);
+            return ResponseEntity.ok(updatedUser); // Retourner le DTO de l'utilisateur avec statut mis à jour
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+
+
+
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<?> handleUserAlreadyExistsException(UserAlreadyExistsException e) {

@@ -8,6 +8,7 @@ import adoption.animalannonce.exception.FunctionalException;
 import adoption.animalannonce.services.AnimalAnnonceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,26 @@ public class AnimalAnnonceController {
         List<Adoption> adoptions = animalAnnonceService.getAdoptionsForUser(userId);
         return ResponseEntity.ok(adoptions);
     }
+
+    @GetMapping("/allWithAnimalAndStatus")
+    public ResponseEntity<List<AdoptionDto>> getAllAdoptionsWithAnimalAndStatus() {
+        try {
+            // Appeler le service pour récupérer toutes les adoptions avec leurs animaux et statuts
+            List<AdoptionDto> adoptionDtos = animalAnnonceService.getAllAdoptionsWithAnimalAndStatus();
+
+            // Si des adoptions sont trouvées, retourner une réponse avec les données
+            return ResponseEntity.ok(adoptionDtos);
+        } catch (FunctionalException e) {
+            // Si une exception fonctionnelle est levée (par exemple, aucune adoption trouvée)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            // En cas d'autre erreur, retourner un code d'erreur interne
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+
 
     @GetMapping("hello")
     public void hello() {

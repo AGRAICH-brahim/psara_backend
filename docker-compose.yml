@@ -1,6 +1,30 @@
 version: '3.8'
 
 services:
+  one-to-one-websocket:
+    image: one-to-one-websocket-service
+    ports:
+      - "8210:8210"
+
+  user-management:
+    image: user-management-service
+    ports:
+      - "8200:8200"
+
+  animal-annonce:
+    image: animal-annonce-service
+    ports:
+      - "8202:8202"
+
+  discovery-service:
+    image: discovery-service
+    ports:
+      - "8761:8761"
+
+  config-server:
+    image: config-server
+    ports:
+      - "8888:8888"
   mongodb:
     image: mongo
     container_name: mongo_db

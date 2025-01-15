@@ -154,6 +154,51 @@ public class AnimalAnnonceService {
         return adoptionRepository.findAdoptionsByUserCreation(userId);
     }
 
+    public List<AdoptionDto> getAllAdoptionsWithAnimalAndStatus() throws FunctionalException {
+        // Récupérer toutes les adoptions
+        List<Adoption> adoptions = adoptionRepository.findAll();
+
+        // Si aucune adoption n'est trouvée, lancer une exception
+        if (adoptions.isEmpty()) {
+            throw new FunctionalException("Aucune adoption trouvée.");
+        }
+
+        // Créer une liste de AdoptionDto pour retourner les résultats
+        List<AdoptionDto> adoptionDtos = new ArrayList<>();
+        for (Adoption adoption : adoptions) {
+            // Récupérer l'animal associé à chaque adoption
+            AnimalAnnonce animalAnnonce = adoption.getAnimalAnnonce(); // Assurez-vous que la relation est correctement définie dans l'entité Adoption
+
+            // Mapper l'entité Adoption en AdoptionDto
+            AdoptionDto adoptionDto = new AdoptionDto();
+            adoptionDto.setId(adoption.getId());
+            adoptionDto.setDataDemande(adoption.getDataDemande());
+            adoptionDto.setDateValidation(adoption.getDateValidation());
+            adoptionDto.setTypeAdoption(adoption.getTypeAdoption());
+            adoptionDto.setIdUser(adoption.getIdUser());
+
+            // Mapper l'animal associé (AnimalAnnonce) en AnimalAnnonceDto
+            if (animalAnnonce != null) {
+                AnimalAnnonceDto animalAnnonceDto = animalAnnonceMapper.toDto(animalAnnonce);
+                adoptionDto.setAnimalAnnonce(animalAnnonceDto); // Assurez-vous que votre AdoptionDto contient un champ pour l'AnimalAnnonce
+            }
+
+            // Ajouter l'adoption avec l'animal et le statut à la liste des résultats
+            adoptionDtos.add(adoptionDto);
+        }
+
+        return adoptionDtos;
+    }
+
+
+
+
+
+
+
+
+
+
     public AnimalAnnonceDto updateAnimal_Annonce(Long id, AnimalAnnonceDto animalAnnonceDto) throws FunctionalException, IOException {
         Optional<AnimalAnnonce> existingAnnonceOptional = animalAnnonceRepository.findById(id);
 
